@@ -1,0 +1,42 @@
+* SRAM SNM Measurement
+
+.include /home/take/.xschem/lib/mos.lib
+
+* 供給電圧
+* .param vdd=5
+
+* Supply voltage
+VDD VDD 0 5
+VSS VSS 0 0
+
+* Ensure all nodes are connected
+VWL WL 0 5
+VBL BL 0 5
+VBR BR 0 5
+
+* SRAM Bitcell (6T)
+M1 X  N1 VDD VDD pchor1ex L=1u W=3u
+M2 N2 X  VDD VDD pchor1ex L=1u W=3u
+M3 X  N1 VSS VSS nchor1ex L=1u W=2u
+M4 N2 X  VSS VSS nchor1ex L=1u W=2u
+M5 X  WL BL  VSS nchor1ex L=1u W=2u
+M6 N2 WL BR  VSS nchor1ex L=1u W=2u
+
+* DC Sweep for SNM
+* Vtest1 X 0 5
+Vtest2 N1 0 5
+
+* .options gmin=1e-12 reltol=1e-4 abstol=1e-10 chgtol=1e-14 itl1=500 itl2=200 itl4=100
+* .options gmin=1e-12 reltol=1e-4 abstol=1e-10 chgtol=1e-14 itl1=500 itl2=200 itl4=100 trtol=1e-9
+
+.control
+  * DC解析
+* dc Vtest1 0 5 0.1 Vtest2 0 5 0.1
+dc Vtest2 0 5 0.1
+
+  * バタフライカーブ出力
+  plot v(X) v(N2)
+  wrdata snm_output2.csv v(X) v(N2) 
+.endc
+
+.end
